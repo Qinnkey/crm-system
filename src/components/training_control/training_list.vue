@@ -34,16 +34,17 @@
             <el-form-item :span="7">
               <el-button v-if="limitCtrl.searchBtn==1" type="success" icon="search" @click="search">查找</el-button>
               <el-button v-if="limitCtrl.addBtn==1" type="info" icon="plus" @click="add">添加</el-button>
-              <el-upload style="display: inline-block; margin-left: 10px;" v-if="limitCtrl.importBtn==1" :on-success="handlesuccess" :before-upload="beforeAvatarUpload" :data="token"  :show-file-list="false"
-                         action="/list/employee/importExcel">
-               	<el-button type="primary">员工导入</el-button>
-              </el-upload>
+              <el-button type="info" icon="arrow-down" v-if="limitCtrl.importBtn==1" @click="dataExport">导出</el-button>
+              <!--<el-upload style="display: inline-block; margin-left: 10px;" v-if="limitCtrl.importBtn==1" :on-success="handlesuccess" :before-upload="beforeAvatarUpload" :data="token"  :show-file-list="false"
+                         action="/list/training/exportExcel">
+               	<el-button type="primary">列表导出</el-button>
+              </el-upload>-->
             </el-form-item>
           </el-row>
         </el-form>
         <!--表格块-->
-        <el-table :data="tableData3" border height="460" @selection-change="handleSelectionChange">
-          <!--<el-table-column type="selection" width="55"></el-table-column>-->
+        <el-table :data="tableData3" ref="multipleTable" border height="460" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column v-for="item in table_list" :key="item.name" :prop="item.prop" :label="item.name"
                            :width="item.width"></el-table-column>
           <el-table-column label="操作" width="calc(100% - 975px)">
@@ -85,6 +86,7 @@
     name: 'training_list',
     data() {
       return {
+      	multipleTable:[],
         //时间选择限定
         pickerOptions0: {
 //        disabledDate(time) {
@@ -130,6 +132,26 @@
       this.loadData();
     },
     methods: {
+//  	console.log("导出数据")
+    	dataExport(){
+				if(this.multipleSelection.length == 0){
+					  this.$message({
+			          message: '请选择导出客户',
+			          type: 'warning'
+			        });
+					return false;
+				}
+				this.$http.get("/list/training/exportExcel", {
+					params: {
+						token: localStorage.CRM_token,
+						trainingrecordids: this.multipleSelection
+					}
+				}).then(function(res) {
+					//跳转下载
+					location.href = "/list/training/exportExcel?trainingrecordids[]=" + this.multipleSelection+"&token="+localStorage.CRM_token;
+					this.$refs.multipleTable.clearSelection();
+				})
+			},
       reload(text) {
         if (text == 1) {
           this.loadData();
@@ -191,7 +213,10 @@
         })
       },
       handleSelectionChange(val) {
-        this.multipleSelection = val;
+      	this.multipleSelection = [];
+				for(var i = 0; i < val.length; i++) {
+					this.multipleSelection.push(val[i].trainingrecordid)
+				}
       },
       //员工信息修改页
       handleEdit(index, row) {

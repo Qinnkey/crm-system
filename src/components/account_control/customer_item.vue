@@ -131,6 +131,8 @@
             params: {
               	token: localStorage.CRM_token,
                 custuserid: this.$route.query.custuserid,
+                pageNum:this.currentPage,
+                pageSize:this.pageSize
             }
           }
         ).then(function (res) {

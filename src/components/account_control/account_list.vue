@@ -83,6 +83,7 @@
           {name: '帐号类型', prop: 'accountypename', width: '150'},
           {name: '帐号', prop: 'username', width: '150'}, 
           {name: '密码', prop: 'password', width: '120'},
+          {name: '创建人', prop: 'createbyName', width: '120'},
           {name: '其他', prop: 'comments', width: '200'},
         ],
         tableData3: [],
